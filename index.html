@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>+1 Speed Per Second</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #05080f;
+      --card: #0d1526;
+      --blue: #1565ff;
+      --blue-light: #4d8aff;
+      --red: #ff2020;
+      --yellow: #ffd600;
+      --green: #00e676;
+      --text: #e8eaf6;
+      --muted: #5c6bc0;
+      --border: rgba(21,101,255,0.2);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Rajdhani', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ─── ANNOUNCEMENT BANNER ─── */
+    #banner {
+      width: 100%;
+      padding: 0.6rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      position: relative;
+      z-index: 1100;
+    }
+    #banner.hidden { display: none; }
+    #banner-close {
+      position: absolute; right: 1.2rem;
+      background: none; border: none;
+      color: inherit; font-size: 1.1rem;
+      cursor: pointer; opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    #banner-close:hover { opacity: 1; }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 0; width: 100%;
+      z-index: 1000;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 3rem;
+      background: rgba(5,8,15,0.93);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      transition: top 0.3s;
+    }
+    .logo {
+      font-family: 'Orbitron', monospace;
+      font-weight: 900; font-size: 1.1rem;
+      color: var(--blue-light);
+      text-shadow: 0 0 20px rgba(21,101,255,0.5);
+      cursor: pointer;
+    }
+    .logo .r { color: var(--red); }
+    .logo .y { color: var(--yellow); }
+    nav ul { list-style:none; display:flex; gap:2rem; }
+    nav a {
+      color: var(--muted);
+      text-decoration:none;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.82rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      transition: color 0.2s, text-shadow 0.2s;
+      cursor: pointer;
+    }
+    nav a:hover, nav a.active {
+      color: var(--blue-light);
+      text-shadow: 0 0 12px rgba(77,138,255,0.7);
+    }
+    .nav-discord {
+      display:inline-flex; align-items:center; gap:0.4rem;
+      padding: 0.4rem 1rem;
+      background: rgba(88,101,242,0.15);
+      border: 1px solid rgba(88,101,242,0.4);
+      border-radius: 2px;
+      color: #7289da !important;
+      transition: background 0.2s, box-shadow 0.2s !important;
+    }
+    .nav-discord:hover {
+      background: rgba(88,101,242,0.3) !important;
+      box-shadow: 0 0 15px rgba(88,101,242,0.4);
+      color: #fff !important;
+      text-shadow: none !important;
+    }
+
+    /* PAGES */
+    .page { display:none; min-height:100vh; padding-top:80px; }
+    .page.active { display:block; }
+
+    /* ─── HERO ─── */
+    .hero {
+      position:relative; min-height:100vh;
+      display:flex; flex-direction:column;
+      justify-content:center; align-items:center;
+      text-align:center; padding:2rem; overflow:hidden;
+    }
+    .hero::before {
+      content:'';
+      position:absolute; inset:0;
+      background-image:
+        linear-gradient(rgba(21,101,255,0.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(21,101,255,0.055) 1px, transparent 1px);
+      background-size:60px 60px;
+      animation: gridMove 20s linear infinite;
+    }
+    @keyframes gridMove { 0%{transform:translateY(0)} 100%{transform:translateY(60px)} }
+    .hero-glow {
+      position:absolute; top:50%; left:50%;
+      transform:translate(-50%,-50%);
+      width:750px; height:750px;
+      background:radial-gradient(circle, rgba(21,101,255,0.09) 0%, rgba(255,32,32,0.04) 45%, transparent 70%);
+      pointer-events:none;
+    }
+    .hero-content { position:relative; z-index:1; }
+    .roblox-badge {
+      display:inline-flex; align-items:center; gap:0.5rem;
+      background:rgba(255,214,0,0.09);
+      border:1px solid rgba(255,214,0,0.35);
+      color:var(--yellow);
+      font-family:'Share Tech Mono',monospace;
+      font-size:0.74rem; letter-spacing:0.15em;
+      text-transform:uppercase; padding:0.35rem 1.1rem;
+      margin-bottom:1.5rem;
+      clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
+      animation:fadeUp 0.8s ease both;
+    }
+    .speed-counter {
+      font-family:'Orbitron',monospace;
+      font-size:clamp(3rem,10vw,8rem); font-weight:900;
+      background:linear-gradient(135deg,var(--blue-light) 0%,var(--red) 50%,var(--yellow) 100%);
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text; line-height:1;
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .hero-tag {
+      font-family:'Share Tech Mono',monospace;
+      font-size:clamp(0.65rem,1.8vw,0.95rem);
+      letter-spacing:0.45em; text-transform:uppercase;
+      margin:0.8rem 0 1.5rem;
+      animation:fadeUp 1s ease 0.4s both;
+      background:linear-gradient(90deg,var(--blue-light),var(--red));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .hero-desc {
+      max-width:580px; font-size:1.15rem;
+      color:#8899cc; line-height:1.8;
+      margin:0 auto 2.5rem;
+      animation:fadeUp 1s ease 0.7s both;
+    }
+    @keyframes fadeUp {
+      from{opacity:0;transform:translateY(25px)}
+      to{opacity:1;transform:translateY(0)}
+    }
+    .btn-group {
+      display:flex; gap:1rem;
+      justify-content:center; flex-wrap:wrap;
+      animation:fadeUp 1s ease 1s both;
+    }
+    .btn {
+      display:inline-flex; align-items:center; gap:0.5rem;
+      padding:0.85rem 2.2rem;
+      font-family:'Orbitron',monospace;
+      font-size:0.78rem; font-weight:700;
+      letter-spacing:0.08em; text-transform:uppercase;
+      text-decoration:none; border:none;
+      cursor:pointer; transition:all 0.3s;
+      clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);
+    }
+    .btn-primary {
+      background:linear-gradient(135deg,var(--blue),#003bb5);
+      color:#fff; box-shadow:0 0 25px rgba(21,101,255,0.4);
+    }
+    .btn-primary:hover {
+      background:linear-gradient(135deg,var(--blue-light),var(--blue));
+      box-shadow:0 0 45px rgba(21,101,255,0.7);
+      transform:translateY(-2px);
+    }
+    .btn-red {
+      background:linear-gradient(135deg,var(--red),#aa0000);
+      color:#fff; box-shadow:0 0 25px rgba(255,32,32,0.35);
+    }
+    .btn-red:hover { box-shadow:0 0 45px rgba(255,32,32,0.6); transform:translateY(-2px); }
+    .btn-discord {
+      background:linear-gradient(135deg,#5865f2,#3b4abf);
+      color:#fff; box-shadow:0 0 25px rgba(88,101,242,0.35);
+    }
+    .btn-discord:hover { box-shadow:0 0 45px rgba(88,101,242,0.6); transform:translateY(-2px); }
+
+    /* SECTIONS */
+    .section { padding:5rem 2rem; max-width:1000px; margin:0 auto; }
+    .section-label {
+      font-family:'Share Tech Mono',monospace;
+      font-size:0.75rem; color:var(--red);
+      letter-spacing:0.3em; text-transform:uppercase; margin-bottom:0.5rem;
+    }
+    .section-title {
+      font-family:'Orbitron',monospace;
+      font-size:clamp(1.4rem,3.5vw,2.2rem);
+      font-weight:700; color:var(--text); margin-bottom:2.5rem;
+    }
+
+    /* LIVE DEMO */
+    .counter-widget {
+      background:var(--card); border:1px solid var(--border);
+      padding:3rem; text-align:center;
+      position:relative; overflow:hidden;
+      clip-path:polygon(0 0,calc(100% - 24px) 0,100% 24px,100% 100%,24px 100%,0 calc(100% - 24px));
+    }
+    .counter-widget::before {
+      content:''; position:absolute; inset:0;
+      background:radial-gradient(ellipse at center,rgba(21,101,255,0.06) 0%,transparent 65%);
+      pointer-events:none;
+    }
+    .live-display {
+      font-family:'Orbitron',monospace;
+      font-size:clamp(3rem,8vw,5.5rem); font-weight:900;
+      background:linear-gradient(135deg,var(--blue-light),var(--yellow));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+      background-clip:text;
+    }
+    .live-label {
+      font-family:'Share Tech Mono',monospace;
+      font-size:0.8rem; color:var(--muted);
+      letter-spacing:0.2em; text-transform:uppercase; margin-top:0.6rem;
+    }
+    .live-bar { width:100%; height:3px; background:rgba(21,101,255,0.1); margin-top:2rem; overflow:hidden; }
+    .live-bar-fill {
+      height:100%;
+      background:linear-gradient(to right,var(--blue),var(--red),var(--yellow));
+      animation:barFill 1s linear infinite; width:0%;
+    }
+    @keyframes barFill { 0%{width:0%} 100%{width:100%} }
+
+    /* FEATURES */
+    .features-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:1.5rem; }
+    .feature-card {
+      background:var(--card); border:1px solid var(--border);
+      padding:2rem; position:relative; overflow:hidden;
+      transition:border-color 0.3s,transform 0.3s;
+      clip-path:polygon(0 0,calc(100% - 14px) 0,100% 14px,100% 100%,14px 100%,0 calc(100% - 14px));
+    }
+    .feature-card::before {
+      content:''; position:absolute; top:0; left:0;
+      width:3px; height:100%;
+      background:linear-gradient(to bottom,var(--blue),var(--red),var(--yellow));
+    }
+    .feature-card:hover { border-color:rgba(21,101,255,0.45); transform:translateY(-4px); }
+    .feature-icon { font-size:2rem; margin-bottom:0.8rem; }
+    .feature-title { font-family:'Orbitron',monospace; font-size:0.9rem; font-weight:700; color:var(--blue-light); margin-bottom:0.7rem; }
+    .feature-desc { font-size:0.95rem; color:#7788aa; line-height:1.6; }
+
+    /* ─── UPDATE LOG ─── */
+    .update-log { display:flex; flex-direction:column; gap:1.2rem; }
+    .update-entry {
+      background:var(--card); border:1px solid var(--border);
+      padding:1.5rem 1.8rem;
+      position:relative; overflow:hidden;
+      clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));
+      transition:border-color 0.3s;
+    }
+    .update-entry:hover { border-color:rgba(21,101,255,0.4); }
+    .update-entry::before {
+      content:''; position:absolute; top:0; left:0;
+      width:3px; height:100%;
+    }
+    .update-entry.tag-update::before { background:var(--blue); }
+    .update-entry.tag-hotfix::before { background:var(--red); }
+    .update-entry.tag-new::before { background:var(--green); }
+    .update-entry.tag-balance::before { background:var(--yellow); }
+    .update-entry.tag-event::before { background:#c678dd; }
+
+    .update-header { display:flex; align-items:center; gap:0.8rem; margin-bottom:0.6rem; flex-wrap:wrap; }
+    .update-version {
+      font-family:'Orbitron',monospace; font-size:0.9rem;
+      font-weight:700; color:var(--text);
+    }
+    .update-tag {
+      font-family:'Share Tech Mono',monospace;
+      font-size:0.68rem; letter-spacing:0.12em;
+      text-transform:uppercase; padding:0.18rem 0.65rem;
+      clip-path:polygon(4px 0%,100% 0%,calc(100% - 4px) 100%,0% 100%);
+    }
+    .tag-update .update-tag { background:rgba(21,101,255,0.2); color:var(--blue-light); border:1px solid rgba(21,101,255,0.35); }
+    .tag-hotfix .update-tag { background:rgba(255,32,32,0.15); color:#ff6060; border:1px solid rgba(255,32,32,0.3); }
+    .tag-new .update-tag { background:rgba(0,230,118,0.12); color:var(--green); border:1px solid rgba(0,230,118,0.3); }
+    .tag-balance .update-tag { background:rgba(255,214,0,0.1); color:var(--yellow); border:1px solid rgba(255,214,0,0.3); }
+    .tag-event .update-tag { background:rgba(198,120,221,0.12); color:#c678dd; border:1px solid rgba(198,120,221,0.3); }
+
+    .update-date {
+      font-family:'Share Tech Mono',monospace;
+      font-size:0.72rem; color:var(--muted); margin-left:auto;
+    }
+    .update-desc { font-size:0.97rem; color:#7788aa; line-height:1.7; }
+    .update-items { list-style:none; margin-top:0.6rem; }
+    .update-items li {
+      font-size:0.92rem; color:#7788aa; line-height:1.6;
+      padding-left:1.2rem; position:relative;
+    }
+    .update-items li::before {
+      content:'›'; position:absolute; left:0;
+      color:var(--blue-light);
+    }
+
+    /* CTA BOX */
+    .play-cta {
+      background:linear-gradient(135deg,rgba(21,101,255,0.07) 0%,rgba(255,32,32,0.05) 50%,rgba(255,214,0,0.04) 100%);
+      border:1px solid var(--border);
+      padding:4rem 2rem; text-align:center; margin:3rem 0;
+      position:relative; overflow:hidden;
+    }
+    .play-cta::before {
+      content:''; position:absolute; top:0; left:50%;
+      transform:translateX(-50%); width:1px; height:50px;
+      background:linear-gradient(to bottom,transparent,var(--blue));
+    }
+    .play-title { font-family:'Orbitron',monospace; font-size:clamp(1.4rem,3vw,2rem); font-weight:700; color:var(--text); margin-bottom:0.8rem; }
+    .play-desc { color:#7788aa; max-width:480px; margin:0 auto 2rem; line-height:1.7; }
+
+    /* ─── TEAM PAGE ─── */
+    .team-hero { text-align:center; padding:4rem 2rem 2rem; }
+    .team-grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+      gap:2rem; max-width:780px;
+      margin:0 auto; padding:2rem;
+    }
+    .team-card {
+      background:var(--card); border:1px solid var(--border);
+      overflow:hidden; position:relative;
+      transition:transform 0.3s,border-color 0.3s;
+      clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,20px 100%,0 calc(100% - 20px));
+    }
+    .team-card:hover { transform:translateY(-6px); border-color:rgba(21,101,255,0.5); }
+    .team-img-wrap { position:relative; width:100%; aspect-ratio:1/1; overflow:hidden; }
+    .team-img-overlay {
+      position:absolute; inset:0;
+      background:linear-gradient(to top,rgba(21,101,255,0.3) 0%,transparent 60%);
+      opacity:0; transition:opacity 0.4s;
+    }
+    .team-card:hover .team-img-overlay { opacity:1; }
+    .team-info { padding:1.6rem; border-top:1px solid var(--border); }
+    .team-name { font-family:'Orbitron',monospace; font-size:1.1rem; font-weight:700; color:var(--blue-light); margin-bottom:0.3rem; }
+    .team-role { font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:var(--yellow); letter-spacing:0.12em; text-transform:uppercase; margin-bottom:0.8rem; }
+    .team-bio { font-size:0.95rem; color:#7788aa; line-height:1.6; }
+    .roblox-link {
+      display:inline-flex; align-items:center; gap:0.5rem;
+      margin-top:1.2rem; padding:0.5rem 1.2rem;
+      background:rgba(21,101,255,0.12); border:1px solid rgba(21,101,255,0.3);
+      color:var(--blue-light); font-family:'Share Tech Mono',monospace;
+      font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase;
+      text-decoration:none; transition:all 0.2s;
+      clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
+    }
+    .roblox-link:hover { background:rgba(21,101,255,0.25); border-color:var(--blue-light); box-shadow:0 0 15px rgba(21,101,255,0.3); }
+    .unavailable-tag {
+      display:inline-flex; align-items:center; gap:0.4rem;
+      margin-top:1.2rem; padding:0.5rem 1.2rem;
+      background:rgba(255,32,32,0.08); border:1px solid rgba(255,32,32,0.25);
+      color:#ff7070; font-family:'Share Tech Mono',monospace;
+      font-size:0.75rem; letter-spacing:0.1em; text-transform:uppercase;
+      clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);
+    }
+
+    /* DISCORD SECTION */
+    .discord-section {
+      background:linear-gradient(135deg,rgba(88,101,242,0.1),rgba(88,101,242,0.04));
+      border:1px solid rgba(88,101,242,0.3);
+      padding:3.5rem 2rem; text-align:center; margin:3rem 0;
+      position:relative; overflow:hidden;
+    }
+    .discord-section::before {
+      content:''; position:absolute; inset:0;
+      background:radial-gradient(ellipse at center,rgba(88,101,242,0.07) 0%,transparent 65%);
+      pointer-events:none;
+    }
+    .discord-icon { font-size:3rem; margin-bottom:1rem; }
+    .discord-title { font-family:'Orbitron',monospace; font-size:1.8rem; font-weight:700; color:var(--text); margin-bottom:0.7rem; }
+    .discord-desc { color:#7788aa; max-width:440px; margin:0 auto 2rem; line-height:1.7; }
+
+    /* FOOTER */
+    footer {
+      border-top:1px solid var(--border);
+      padding:2rem 3rem;
+      display:flex; justify-content:space-between;
+      align-items:center; flex-wrap:wrap; gap:1rem; margin-top:4rem;
+    }
+    .footer-logo {
+      font-family:'Orbitron',monospace; font-size:0.9rem; font-weight:900;
+      background:linear-gradient(90deg,var(--blue-light),var(--red),var(--yellow));
+      -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    }
+    .footer-copy { font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:var(--muted); }
+    .footer-links { display:flex; gap:1.5rem; }
+    .footer-links a {
+      font-family:'Share Tech Mono',monospace; font-size:0.75rem;
+      color:var(--muted); text-decoration:none; transition:color 0.2s;
+    }
+    .footer-links a:hover { color:var(--blue-light); }
+
+    ::-webkit-scrollbar { width:5px; }
+    ::-webkit-scrollbar-track { background:var(--bg); }
+    ::-webkit-scrollbar-thumb { background:var(--blue); }
+
+    @media(max-width:700px){
+      nav { padding:1rem 1.2rem; }
+      nav ul { gap:1rem; }
+      .team-grid { grid-template-columns:1fr; padding:1rem; }
+      footer { flex-direction:column; text-align:center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     ⚙️  CONFIGURATION — Edit this section
+     ════════════════════════════════════════ -->
+<script>
+const CONFIG = {
+
+  // ── BANNER ──────────────────────────────
+  // Set to true to show the announcement banner, false to hide it
+  bannerEnabled: true,
+  // The text shown in the banner
+  bannerText: "🎉 Version 2.0 is LIVE — New maps, new mechanics, more speed!",
+  // Banner color: "blue" | "red" | "yellow" | "green" | "purple"
+  bannerColor: "yellow",
+
+  // ── UPDATE LOG ──────────────────────────
+  // Add entries here. Tags: "update" | "hotfix" | "new" | "balance" | "event"
+  updates: [
+    {
+      version: "v2.0",
+      tag: "update",
+      date: "2025-07-01",
+      description: "Major overhaul update.",
+      items: [
+        "Added 3 new maps",
+        "Reworked speed scaling system",
+        "New particle effects",
+        "Performance improvements across all devices"
+      ]
+    },
+    {
+      version: "v1.5",
+      tag: "new",
+      date: "2025-05-14",
+      description: "New content drop.",
+      items: [
+        "Added leaderboard system",
+        "New obstacle type: Speed Walls",
+        "Added sound effects"
+      ]
+    },
+    {
+      version: "v1.2 Hotfix",
+      tag: "hotfix",
+      date: "2025-04-02",
+      description: "Critical bug fixes.",
+      items: [
+        "Fixed speed counter not resetting on respawn",
+        "Fixed invisible wall glitch in Map 2"
+      ]
+    },
+    {
+      version: "v1.1",
+      tag: "balance",
+      date: "2025-03-20",
+      description: "Balance pass.",
+      items: [
+        "Reduced early game speed ramp",
+        "Adjusted obstacle placement in Map 1"
+      ]
+    },
+    {
+      version: "v1.0 — Launch",
+      tag: "event",
+      date: "2025-03-01",
+      description: "The game is officially live on Roblox! Thank you to everyone who played during testing.",
+      items: []
+    }
+  ]
+};
+</script>
+<!-- ════════════════════════════════════════
+     End of configuration
+     ════════════════════════════════════════ -->
+
+<!-- BANNER -->
+<div id="banner">
+  <span id="banner-icon">📢</span>
+  <span id="banner-text"></span>
+  <button id="banner-close" onclick="document.getElementById('banner').classList.add('hidden')">✕</button>
+</div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <span class="logo" onclick="showPage('home')">+<span class="r">1</span> SPEED<span class="y">/S</span></span>
+  <ul>
+    <li><a onclick="showPage('home')" id="nav-home" class="active">Home</a></li>
+    <li><a onclick="showPage('updates')" id="nav-updates">Updates</a></li>
+    <li><a onclick="showPage('team')" id="nav-team">Team</a></li>
+    <li><a href="https://www.roblox.com/de/games/96306857610199/random-game-for-now" target="_blank">▶ Play</a></li>
+    <li><a href="https://discord.gg/FzGgkpzKeg" target="_blank" class="nav-discord">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.13 18.115a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+      Discord
+    </a></li>
+  </ul>
+</nav>
+
+<!-- ═══════════ HOME PAGE ═══════════ -->
+<div id="page-home" class="page active">
+
+  <section class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-content">
+      <div class="roblox-badge">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M5.007 0L0 18.994 18.994 24 24 5.006zm9.347 13.58l-4.961-1.33 1.33-4.96 4.961 1.33z"/></svg>
+        Roblox Game
+      </div>
+      <div class="speed-counter" id="heroCounter">+1</div>
+      <div class="hero-tag">Speed Per Second</div>
+      <p class="hero-desc">
+        A Roblox experience where speed never stops growing.<br>
+        Every second counts. Every second adds up.
+      </p>
+      <div class="btn-group">
+        <a href="https://www.roblox.com/de/games/96306857610199/random-game-for-now" target="_blank" class="btn btn-primary">▶ &nbsp;Play Now</a>
+        <a href="https://discord.gg/FzGgkpzKeg" target="_blank" class="btn btn-discord">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.13 18.115a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+          Discord
+        </a>
+        <span onclick="showPage('team')" class="btn btn-red" style="cursor:pointer;">👥 &nbsp;Team</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIVE DEMO -->
+  <div class="section">
+    <div class="section-label">// Live Demo</div>
+    <div class="section-title">Watch it in action</div>
+    <div class="counter-widget">
+      <div class="live-display" id="liveCounter">+0</div>
+      <div class="live-label">Speed increases by 1 every second</div>
+      <div class="live-bar"><div class="live-bar-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="section">
+    <div class="section-label">// Features</div>
+    <div class="section-title">What makes it special?</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-title">+1 Every Second</div>
+        <div class="feature-desc">Your speed grows by exactly 1 every single second. Simple, addictive, unstoppable.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎮</div>
+        <div class="feature-title">On Roblox</div>
+        <div class="feature-desc">Built natively on the Roblox platform — play with friends, no extra installs needed.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">♾️</div>
+        <div class="feature-title">No Speed Cap</div>
+        <div class="feature-desc">There's no maximum. The number just keeps climbing — how long can you keep up?</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🏆</div>
+        <div class="feature-title">Compete</div>
+        <div class="feature-desc">Challenge friends. See who lasts the longest. Only the fastest survive.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔄</div>
+        <div class="feature-title">Always Updating</div>
+        <div class="feature-desc">Our team actively develops new content and mechanics. Check the Update Log.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🆓</div>
+        <div class="feature-title">Free to Play</div>
+        <div class="feature-desc">100% free on Roblox. Jump in any time — no barriers, just pure speed.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DISCORD CTA -->
+  <div class="section">
+    <div class="discord-section">
+      <div class="discord-icon">💬</div>
+      <div class="discord-title">Join our Discord</div>
+      <p class="discord-desc">Get updates, talk to the team, share your high scores and connect with other players.</p>
+      <a href="https://discord.gg/FzGgkpzKeg" target="_blank" class="btn btn-discord" style="font-size:0.88rem;padding:1rem 2.5rem;">
+        Join Server
+      </a>
+    </div>
+  </div>
+
+  <!-- PLAY CTA -->
+  <div class="section" style="padding-top:0;">
+    <div class="play-cta">
+      <div class="play-title">Ready to go faster?</div>
+      <p class="play-desc">Jump into the game on Roblox and feel the +1 per second rush for yourself.</p>
+      <a href="https://www.roblox.com/de/games/96306857610199/random-game-for-now" target="_blank" class="btn btn-primary" style="font-size:0.88rem;padding:1rem 2.5rem;">
+        ▶ &nbsp;Open in Roblox
+      </a>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-logo">+1 SPEED PER SECOND</div>
+    <div class="footer-links">
+      <a href="https://discord.gg/FzGgkpzKeg" target="_blank">Discord</a>
+      <a href="https://www.roblox.com/de/games/96306857610199/random-game-for-now" target="_blank">Play</a>
+      <a onclick="showPage('updates')" style="cursor:pointer;">Updates</a>
+      <a onclick="showPage('team')" style="cursor:pointer;">Team</a>
+    </div>
+    <div class="footer-copy">© 2025 +1 Speed Per Second</div>
+  </footer>
+</div>
+
+<!-- ═══════════ UPDATES PAGE ═══════════ -->
+<div id="page-updates" class="page">
+  <div class="section">
+    <div class="section-label">// Changelog</div>
+    <div class="section-title">Update Log</div>
+    <div class="update-log" id="updateLog"></div>
+  </div>
+  <footer>
+    <div class="footer-logo">+1 SPEED PER SECOND</div>
+    <div class="footer-links">
+      <a href="https://discord.gg/FzGgkpzKeg" target="_blank">Discord</a>
+      <a href="https://www.roblox.com/de/games/96306857610199/random-game-for-now" target="_blank">Play</a>
+    </div>
+    <div class="footer-copy">© 2025 +1 Speed Per Second</div>
+  </footer>
+</div>
+
+<!-- ═══════════ TEAM PAGE ═══════════ -->
+<div id="page-team" class="page">
+  <div class="team-hero">
+    <div class="section-label">// The Owners</div>
+    <div class="section-title" style="font-family:'Orbitron',monospace;font-size:clamp(1.5rem,4vw,2.5rem);font-weight:700;margin-bottom:1rem;">Meet the Team</div>
+    <p style="color:#7788aa;max-width:440px;margin:0 auto;line-height:1.7;">Two owners. One game. Getting faster every second.</p>
+  </div>
+
+  <div class="team-grid">
+    <!-- KYLE -->
+    <div class="team-card">
+      <div class="team-img-wrap">
+        <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;background:linear-gradient(135deg,#05080f,#0a1540);">
+          <defs><radialGradient id="gk" cx="50%" cy="40%" r="55%"><stop offset="0%" stop-color="#1565ff" stop-opacity="0.35"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs>
+          <rect width="300" height="300" fill="url(#gk)"/>
+          <line x1="0" y1="100" x2="300" y2="100" stroke="#1565ff" stroke-width="0.4" opacity="0.25"/>
+          <line x1="0" y1="200" x2="300" y2="200" stroke="#1565ff" stroke-width="0.4" opacity="0.25"/>
+          <line x1="100" y1="0" x2="100" y2="300" stroke="#1565ff" stroke-width="0.4" opacity="0.25"/>
+          <line x1="200" y1="0" x2="200" y2="300" stroke="#1565ff" stroke-width="0.4" opacity="0.25"/>
+          <circle cx="150" cy="115" r="58" fill="#0d1a40" stroke="#1565ff" stroke-width="1.5" opacity="0.9"/>
+          <rect x="126" y="93" width="48" height="44" rx="5" fill="#1565ff" opacity="0.65"/>
+          <rect x="133" y="100" width="13" height="13" rx="2" fill="#fff"/>
+          <rect x="154" y="100" width="13" height="13" rx="2" fill="#fff"/>
+          <rect x="137" y="121" width="26" height="7" rx="3" fill="#fff"/>
+          <ellipse cx="150" cy="240" rx="68" ry="47" fill="#0a1535" opacity="0.8"/>
+          <rect x="118" y="175" width="64" height="60" rx="4" fill="#1565ff" opacity="0.25"/>
+          <circle cx="50" cy="48" r="2" fill="#1565ff" opacity="0.55"/>
+          <circle cx="252" cy="68" r="1.5" fill="#ffd600" opacity="0.5"/>
+        </svg>
+        <div class="team-img-overlay"></div>
+      </div>
+      <div class="team-info">
+        <div class="team-name">KYLE</div>
+        <div class="team-role">Owner</div>
+        <div class="team-bio">One of the two founders of +1 Speed Per Second. Drives the game's direction and leads development.</div>
+        <a href="https://www.roblox.com/de/users/4170090683/profile/" target="_blank" class="roblox-link">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M5.007 0L0 18.994 18.994 24 24 5.006zm9.347 13.58l-4.961-1.33 1.33-4.96 4.961 1.33z"/></svg>
+          View Roblox Profile
+        </a>
+      </div>
+    </div>
+
+    <!-- DEV YVT -->
+    <div class="team-card">
+      <div class="team-img-wrap">
+        <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;background:linear-gradient(135deg,#05080f,#1a0505);">
+          <defs><radialGradient id="gy" cx="50%" cy="40%" r="55%"><stop offset="0%" stop-color="#ff2020" stop-opacity="0.28"/><stop offset="100%" stop-color="transparent"/></radialGradient></defs>
+          <rect width="300" height="300" fill="url(#gy)"/>
+          <line x1="0" y1="100" x2="300" y2="100" stroke="#ff2020" stroke-width="0.4" opacity="0.2"/>
+          <line x1="0" y1="200" x2="300" y2="200" stroke="#ff2020" stroke-width="0.4" opacity="0.2"/>
+          <line x1="100" y1="0" x2="100" y2="300" stroke="#ff2020" stroke-width="0.4" opacity="0.2"/>
+          <line x1="200" y1="0" x2="200" y2="300" stroke="#ff2020" stroke-width="0.4" opacity="0.2"/>
+          <circle cx="150" cy="115" r="58" fill="#1f0505" stroke="#ff2020" stroke-width="1.5" opacity="0.9"/>
+          <text x="150" y="133" text-anchor="middle" font-size="55" font-family="monospace" fill="#ff2020" opacity="0.45" font-weight="bold">?</text>
+          <ellipse cx="150" cy="240" rx="68" ry="47" fill="#150404" opacity="0.8"/>
+          <rect x="118" y="175" width="64" height="60" rx="4" fill="#ff2020" opacity="0.12"/>
+          <circle cx="50" cy="48" r="2" fill="#ffd600" opacity="0.45"/>
+        </svg>
+        <div class="team-img-overlay" style="background:linear-gradient(to top,rgba(255,32,32,0.3) 0%,transparent 60%);"></div>
+      </div>
+      <div class="team-info">
+        <div class="team-name" style="color:var(--red);">DEV YVT</div>
+        <div class="team-role" style="color:var(--red);opacity:0.75;">Owner</div>
+        <div class="team-bio">The second owner and co-founder of +1 Speed Per Second. A key part of the team behind the game.</div>
+        <div class="unavailable-tag">⚠ &nbsp;Profile Currently Unavailable</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="discord-section">
+      <div class="discord-icon">💬</div>
+      <div class="discord-title">Talk to us on Discord</div>
+      <p class="discord-desc">Have questions, suggestions, or just want to hang out? Join the community.</p>
+      <a href="https://discord.gg/FzGgkpzKeg" target="_blank" class="btn btn-discord" style="font-size:0.88rem;padding:1rem 2.5rem;">Join Server</a>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-logo">+1 SPEED PER SECOND</div>
+    <div class="footer-links">
+      <a href="https://discord.gg/FzGgkpzKeg" target="_blank">Discord</a>
+      <a href="https://www.roblox.com/de/games/96306857610199/random-game-for-now" target="_blank">Play</a>
+    </div>
+    <div class="footer-copy">© 2025 +1 Speed Per Second</div>
+  </footer>
+</div>
+
+<script>
+  // ── BANNER SETUP ──
+  const bannerColors = {
+    blue:   { bg: 'linear-gradient(90deg,#0d2a7a,#1a3faa)', color: '#a0c4ff', border: 'rgba(21,101,255,0.4)' },
+    red:    { bg: 'linear-gradient(90deg,#7a0d0d,#aa1a1a)', color: '#ffaaaa', border: 'rgba(255,32,32,0.4)' },
+    yellow: { bg: 'linear-gradient(90deg,#3a2e00,#6a5200)', color: '#ffd600', border: 'rgba(255,214,0,0.4)' },
+    green:  { bg: 'linear-gradient(90deg,#003a1a,#006630)', color: '#00e676', border: 'rgba(0,230,118,0.4)' },
+    purple: { bg: 'linear-gradient(90deg,#2a0050,#4a0090)', color: '#c678dd', border: 'rgba(198,120,221,0.4)' },
+  };
+
+  const banner = document.getElementById('banner');
+  const bc = bannerColors[CONFIG.bannerColor] || bannerColors.blue;
+
+  if (CONFIG.bannerEnabled) {
+    banner.classList.remove('hidden');
+    banner.style.background = bc.bg;
+    banner.style.color = bc.color;
+    banner.style.borderBottom = `1px solid ${bc.border}`;
+    document.getElementById('banner-text').textContent = CONFIG.bannerText;
+    // Push nav down
+    document.getElementById('navbar').style.top = banner.offsetHeight + 'px';
+    document.querySelectorAll('.page').forEach(p => p.style.paddingTop = (80 + banner.offsetHeight) + 'px');
+  } else {
+    banner.classList.add('hidden');
+  }
+
+  // ── UPDATE LOG RENDER ──
+  const tagLabels = {
+    update: 'Update', hotfix: 'Hotfix', new: 'New', balance: 'Balance', event: 'Event'
+  };
+
+  const logEl = document.getElementById('updateLog');
+  CONFIG.updates.forEach(u => {
+    const entry = document.createElement('div');
+    entry.className = `update-entry tag-${u.tag}`;
+    entry.innerHTML = `
+      <div class="update-header">
+        <span class="update-version">${u.version}</span>
+        <span class="update-tag">${tagLabels[u.tag] || u.tag}</span>
+        <span class="update-date">${u.date}</span>
+      </div>
+      <div class="update-desc">${u.description}</div>
+      ${u.items.length ? `<ul class="update-items">${u.items.map(i=>`<li>${i}</li>`).join('')}</ul>` : ''}
+    `;
+    logEl.appendChild(entry);
+  });
+
+  // ── PAGE ROUTING ──
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('nav a[id]').forEach(a => a.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    const navEl = document.getElementById('nav-' + name);
+    if (navEl) navEl.classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  // ── LIVE COUNTER ──
+  let speed = 0;
+  const liveCounter = document.getElementById('liveCounter');
+  setInterval(() => { speed++; liveCounter.textContent = '+' + speed; }, 1000);
+
+  // ── HERO CYCLING ──
+  const heroTexts = ['+1','+2','+3','+∞'];
+  let hIdx = 0;
+  setInterval(() => {
+    hIdx = (hIdx + 1) % heroTexts.length;
+    const el = document.getElementById('heroCounter');
+    el.style.opacity = '0'; el.style.transform = 'translateY(-20px)';
+    setTimeout(() => {
+      el.textContent = heroTexts[hIdx];
+      el.style.transition = 'opacity 0.35s ease,transform 0.35s ease';
+      el.style.opacity = '1'; el.style.transform = 'translateY(0)';
+    }, 300);
+  }, 2000);
+</script>
+</body>
+</html>
