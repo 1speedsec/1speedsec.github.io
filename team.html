@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Team — +1 Speed Per Second</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#05080f;--card:#0d1526;--blue:#1565ff;--blue-light:#4d8aff;--red:#ff2020;--yellow:#ffd600;--text:#e8eaf6;--muted:#5c6bc0;--border:rgba(21,101,255,0.2);}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;overflow-x:hidden;cursor:none;}
+
+    /* CURSOR */
+    #cursor{position:fixed;width:10px;height:10px;background:var(--blue-light);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);box-shadow:0 0 10px rgba(77,138,255,0.8);transition:transform 0.1s,background 0.2s;}
+    #cursor-ring{position:fixed;width:28px;height:28px;border:1px solid rgba(77,138,255,0.5);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);transition:transform 0.15s ease,width 0.2s,height 0.2s;}
+    .particle{position:fixed;pointer-events:none;z-index:99997;font-family:'Orbitron',monospace;font-weight:900;font-size:0.85rem;color:var(--blue-light);text-shadow:0 0 10px rgba(77,138,255,0.9);animation:particleFly 0.9s ease-out forwards;white-space:nowrap;}
+    @keyframes particleFly{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-55px) scale(0.5);}}
+
+    nav{position:fixed;top:0;width:100%;z-index:1000;display:flex;justify-content:space-between;align-items:center;padding:1rem 3rem;background:rgba(5,8,15,0.93);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+    .logo{font-family:'Orbitron',monospace;font-weight:900;font-size:1.1rem;color:var(--blue-light);text-shadow:0 0 20px rgba(21,101,255,0.5);text-decoration:none;}
+    .logo .r{color:var(--red);} .logo .y{color:var(--yellow);}
+    nav ul{list-style:none;display:flex;gap:2rem;align-items:center;}
+    nav a{color:var(--muted);text-decoration:none;font-family:'Share Tech Mono',monospace;font-size:0.82rem;letter-spacing:0.1em;text-transform:uppercase;transition:color 0.2s,text-shadow 0.2s;}
+    nav a:hover,nav a.active{color:var(--blue-light);text-shadow:0 0 12px rgba(77,138,255,0.7);}
+    .nav-discord{display:inline-flex;align-items:center;gap:0.4rem;padding:0.4rem 1rem;background:rgba(88,101,242,0.15);border:1px solid rgba(88,101,242,0.4);border-radius:2px;color:#7289da !important;}
+    .nav-discord:hover{background:rgba(88,101,242,0.3) !important;color:#fff !important;text-shadow:none !important;}
+
+    main{padding-top:80px;min-height:100vh;}
+
+    /* HERO */
+    .team-hero{text-align:center;padding:5rem 2rem 3rem;position:relative;overflow:hidden;}
+    .team-hero::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(21,101,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(21,101,255,0.04) 1px,transparent 1px);background-size:60px 60px;animation:gridMove 20s linear infinite;pointer-events:none;}
+    @keyframes gridMove{0%{transform:translateY(0)}100%{transform:translateY(60px)}}
+    .page-label{font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--red);letter-spacing:0.3em;text-transform:uppercase;margin-bottom:0.5rem;}
+    .page-title{font-family:'Orbitron',monospace;font-size:clamp(2rem,5vw,3.5rem);font-weight:900;background:linear-gradient(135deg,var(--blue-light),var(--red),var(--yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:1rem;}
+    .page-sub{color:#7788aa;max-width:440px;margin:0 auto;line-height:1.7;font-size:1.05rem;}
+
+    /* TEAM GRID */
+    .team-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:2rem;max-width:820px;margin:3rem auto 0;padding:0 2rem 4rem;}
+    .team-card{background:var(--card);border:1px solid var(--border);overflow:hidden;position:relative;transition:transform 0.3s,border-color 0.3s;clip-path:polygon(0 0,calc(100% - 24px) 0,100% 24px,100% 100%,24px 100%,0 calc(100% - 24px));}
+    .team-card:hover{transform:translateY(-8px);border-color:rgba(21,101,255,0.55);}
+    .team-img-wrap{position:relative;width:100%;aspect-ratio:1/1;overflow:hidden;}
+    .team-img-overlay{position:absolute;inset:0;opacity:0;transition:opacity 0.4s;}
+    .team-card:hover .team-img-overlay{opacity:1;}
+
+    .team-info{padding:2rem;border-top:1px solid var(--border);}
+    .team-name{font-family:'Orbitron',monospace;font-size:1.3rem;font-weight:900;color:var(--blue-light);margin-bottom:0.3rem;}
+    .team-role{font-family:'Share Tech Mono',monospace;font-size:0.78rem;color:var(--yellow);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:1rem;}
+    .team-bio{font-size:1rem;color:#7788aa;line-height:1.7;}
+    .profile-btn{display:inline-flex;align-items:center;gap:0.5rem;margin-top:1.5rem;padding:0.6rem 1.4rem;background:rgba(21,101,255,0.12);border:1px solid rgba(21,101,255,0.3);color:var(--blue-light);font-family:'Share Tech Mono',monospace;font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;text-decoration:none;transition:all 0.2s;clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);}
+    .profile-btn:hover{background:rgba(21,101,255,0.25);border-color:var(--blue-light);box-shadow:0 0 18px rgba(21,101,255,0.35);}
+    .unavailable-tag{display:inline-flex;align-items:center;gap:0.4rem;margin-top:1.5rem;padding:0.6rem 1.4rem;background:rgba(255,32,32,0.08);border:1px solid rgba(255,32,32,0.25);color:#ff7070;font-family:'Share Tech Mono',monospace;font-size:0.75rem;letter-spacing:0.1em;text-transform:uppercase;clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);}
+
+    /* DISCORD SECTION */
+    .discord-section{background:linear-gradient(135deg,rgba(88,101,242,0.1),rgba(88,101,242,0.04));border:1px solid rgba(88,101,242,0.3);padding:4rem 2rem;text-align:center;margin:0 2rem 4rem;position:relative;overflow:hidden;}
+    .discord-section::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(88,101,242,0.07) 0%,transparent 65%);pointer-events:none;}
+    .discord-icon{font-size:3rem;margin-bottom:1rem;}
+    .discord-title{font-family:'Orbitron',monospace;font-size:1.8rem;font-weight:700;color:var(--text);margin-bottom:0.7rem;}
+    .discord-desc{color:#7788aa;max-width:440px;margin:0 auto 2rem;line-height:1.7;}
+    .btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.85rem 2.2rem;font-family:'Orbitron',monospace;font-size:0.78rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;border:none;cursor:pointer;transition:all 0.3s;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);}
+    .btn-discord{background:linear-gradient(135deg,#5865f2,#3b4abf);color:#fff;box-shadow:0 0 25px rgba(88,101,242,0.35);}
+    .btn-discord:hover{box-shadow:0 0 45px rgba(88,101,242,0.6);transform:translateY(-2px);}
+
+    footer{border-top:1px solid var(--border);padding:2rem 3rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;}
+    .footer-logo{font-family:'Orbitron',monospace;font-size:0.9rem;font-weight:900;background:linear-gradient(90deg,var(--blue-light),var(--red),var(--yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .footer-copy{font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--muted);}
+    .footer-links{display:flex;gap:1.5rem;}
+    .footer-links a{font-family:'Share Tech Mono',monospace;font-size:0.75rem;color:var(--muted);text-decoration:none;transition:color 0.2s;}
+    .footer-links a:hover{color:var(--blue-light);}
+
+    ::-webkit-scrollbar{width:5px;} ::-webkit-scrollbar-track{background:var(--bg);} ::-webkit-scrollbar-thumb{background:var(--blue);}
+    @media(max-width:700px){nav{padding:1rem 1.2rem;}nav ul{gap:1rem;}.team-grid{grid-template-columns:1fr;}footer{flex-direction:column;text-align:center;}.discord-section{margin:0 1rem 3rem;}}
+  </style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<nav>
+  <a class="logo" href="index.html">+<span class="r">1</span> SPEED<span class="y">/S</span></a>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="index.html#updates">Updates</a></li>
+    <li><a href="team.html" class="active">Team</a></li>
+    <li><a href="https://www.roblox.com/de/games/96306857610199/random-game-for-now" target="_blank">▶ Play</a></li>
+    <li><a href="https://discord.gg/FzGgkpzKeg" target="_blank" class="nav-discord">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057.1 18.08.112 18.1.13 18.115a19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+      Discord
+    </a></li>
+  </ul>
+</nav>
+
+<main>
+  <div class="team-hero">
+    <div class="page-label">// The Owners</div>
+    <div class="page-title">Meet the Team</div>
+    <p class="page-sub">Two owners. One game. Getting faster every second.</p>
+  </div>
+
+  <div class="team-grid">
+
+    <!-- KYLE -->
+    <div class="team-card">
+      <div class="team-img-wrap">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;background:linear-gradient(135deg,#05080f,#0a1540);">
+          <defs>
+            <radialGradient id="gk" cx="50%" cy="40%" r="55%">
+              <stop offset="0%" stop-color="#1565ff" stop-opacity="0.4"/>
+              <stop offset="100%" stop-color="transparent"/>
+            </radialGradient>
+          </defs>
+          <rect width="400" height="400" fill="url(#gk)"/>
+          <!-- Grid -->
+          <line x1="0" y1="133" x2="400" y2="133" stroke="#1565ff" stroke-width="0.5" opacity="0.2"/>
+          <line x1="0" y1="266" x2="400" y2="266" stroke="#1565ff" stroke-width="0.5" opacity="0.2"/>
+          <line x1="133" y1="0" x2="133" y2="400" stroke="#1565ff" stroke-width="0.5" opacity="0.2"/>
+          <line x1="266" y1="0" x2="266" y2="400" stroke="#1565ff" stroke-width="0.5" opacity="0.2"/>
+          <!-- Avatar -->
+          <circle cx="200" cy="155" r="80" fill="#0d1a40" stroke="#1565ff" stroke-width="2" opacity="0.9"/>
+          <!-- Roblox face -->
+          <rect x="164" y="122" width="72" height="66" rx="8" fill="#1565ff" opacity="0.7"/>
+          <rect x="174" y="132" width="20" height="20" rx="3" fill="#fff"/>
+          <rect x="206" y="132" width="20" height="20" rx="3" fill="#fff"/>
+          <rect x="178" y="163" width="44" height="12" rx="6" fill="#fff"/>
+          <!-- Body -->
+          <ellipse cx="200" cy="330" rx="95" ry="65" fill="#0a1535" opacity="0.8"/>
+          <rect x="155" y="240" width="90" height="85" rx="6" fill="#1565ff" opacity="0.3"/>
+          <!-- Decorations -->
+          <circle cx="60" cy="60" r="3" fill="#1565ff" opacity="0.5"/>
+          <circle cx="340" cy="90" r="2" fill="#ffd600" opacity="0.5"/>
+          <circle cx="360" cy="320" r="3" fill="#ff2020" opacity="0.4"/>
+          <circle cx="40" cy="330" r="2" fill="#ffd600" opacity="0.3"/>
+          <!-- Name watermark -->
+          <text x="200" y="390" text-anchor="middle" font-family="monospace" font-size="13" fill="#1565ff" opacity="0.3" letter-spacing="6">KYLE</text>
+        </svg>
+        <div class="team-img-overlay" style="background:linear-gradient(to top,rgba(21,101,255,0.35) 0%,transparent 55%);"></div>
+      </div>
+      <div class="team-info">
+        <div class="team-name">KYLE</div>
+        <div class="team-role">Owner & Founder</div>
+        <div class="team-bio">One of the two founders of +1 Speed Per Second. Drives the game's direction and leads development. The brain behind the +1 concept.</div>
+        <a href="https://www.roblox.com/de/users/4170090683/profile/" target="_blank" class="profile-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M5.007 0L0 18.994 18.994 24 24 5.006zm9.347 13.58l-4.961-1.33 1.33-4.96 4.961 1.33z"/></svg>
+          View Roblox Profile
+        </a>
+      </div>
+    </div>
+
+    <!-- DEV YVT -->
+    <div class="team-card">
+      <div class="team-img-wrap">
+        <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;display:block;background:linear-gradient(135deg,#05080f,#1a0505);">
+          <defs>
+            <radialGradient id="gy" cx="50%" cy="40%" r="55%">
+              <stop offset="0%" stop-color="#ff2020" stop-opacity="0.3"/>
+              <stop offset="100%" stop-color="transparent"/>
+            </radialGradient>
+          </defs>
+          <rect width="400" height="400" fill="url(#gy)"/>
+          <line x1="0" y1="133" x2="400" y2="133" stroke="#ff2020" stroke-width="0.5" opacity="0.18"/>
+          <line x1="0" y1="266" x2="400" y2="266" stroke="#ff2020" stroke-width="0.5" opacity="0.18"/>
+          <line x1="133" y1="0" x2="133" y2="400" stroke="#ff2020" stroke-width="0.5" opacity="0.18"/>
+          <line x1="266" y1="0" x2="266" y2="400" stroke="#ff2020" stroke-width="0.5" opacity="0.18"/>
+          <circle cx="200" cy="155" r="80" fill="#1f0505" stroke="#ff2020" stroke-width="2" opacity="0.9"/>
+          <!-- Unknown / question mark -->
+          <text x="200" y="178" text-anchor="middle" font-size="75" font-family="monospace" fill="#ff2020" opacity="0.4" font-weight="bold">?</text>
+          <ellipse cx="200" cy="330" rx="95" ry="65" fill="#150404" opacity="0.8"/>
+          <rect x="155" y="240" width="90" height="85" rx="6" fill="#ff2020" opacity="0.12"/>
+          <!-- Warning stripes -->
+          <line x1="0" y1="20" x2="20" y2="0" stroke="#ffd600" stroke-width="2" opacity="0.15"/>
+          <line x1="0" y1="40" x2="40" y2="0" stroke="#ffd600" stroke-width="2" opacity="0.1"/>
+          <line x1="0" y1="60" x2="60" y2="0" stroke="#ffd600" stroke-width="2" opacity="0.08"/>
+          <circle cx="60" cy="60" r="3" fill="#ffd600" opacity="0.4"/>
+          <circle cx="340" cy="90" r="2" fill="#ff2020" opacity="0.5"/>
+          <text x="200" y="390" text-anchor="middle" font-family="monospace" font-size="13" fill="#ff2020" opacity="0.25" letter-spacing="3">DEV YVT</text>
+        </svg>
+        <div class="team-img-overlay" style="background:linear-gradient(to top,rgba(255,32,32,0.3) 0%,transparent 55%);"></div>
+      </div>
+      <div class="team-info">
+        <div class="team-name" style="color:var(--red);">DEV YVT</div>
+        <div class="team-role" style="color:var(--red);opacity:0.8;">Owner & Co-Founder</div>
+        <div class="team-bio">The second owner and co-founder of +1 Speed Per Second. A key part of the team and vision behind the game.</div>
+        <div class="unavailable-tag">⚠ &nbsp;Profile Currently Unavailable</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="discord-section" style="max-width:820px;margin:0 auto 4rem;">
+    <div class="discord-icon">💬</div>
+    <div class="discord-title">Talk to us</div>
+    <p class="discord-desc">Questions, suggestions, or just want to hang out? Join the Discord community.</p>
+    <a href="https://discord.gg/FzGgkpzKeg" target="_blank" class="btn btn-discord" style="font-size:0.88rem;padding:1rem 2.5rem;">Join Server</a>
+  </div>
+</main>
+
+<footer>
+  <div class="footer-logo">+1 SPEED PER SECOND</div>
+  <div class="footer-links">
+    <a href="https://discord.gg/FzGgkpzKeg" target="_blank">Discord</a>
+    <a href="https://www.roblox.com/de/games/96306857610199/random-game-for-now" target="_blank">Play</a>
+    <a href="index.html">Home</a>
+  </div>
+  <div class="footer-copy">© 2025 +1 Speed Per Second</div>
+</footer>
+
+<script>
+  const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px';});
+  (function a(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(a);})();
+  const colors=['#4d8aff','#ff2020','#ffd600','#00e676','#c678dd'];
+  document.addEventListener('click',e=>{const p=document.createElement('div');p.className='particle';p.textContent='+1';p.style.left=e.clientX+'px';p.style.top=e.clientY+'px';p.style.color=colors[Math.floor(Math.random()*colors.length)];document.body.appendChild(p);setTimeout(()=>p.remove(),900);});
+</script>
+</body>
+</html>
