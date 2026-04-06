@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>404 — +1 Speed Per Second</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{--bg:#05080f;--blue:#1565ff;--blue-light:#4d8aff;--red:#ff2020;--yellow:#ffd600;--text:#e8eaf6;--muted:#5c6bc0;--border:rgba(21,101,255,0.2);}
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2rem;overflow:hidden;cursor:none;}
+
+    /* CURSOR */
+    #cursor{position:fixed;width:10px;height:10px;background:var(--blue-light);border-radius:50%;pointer-events:none;z-index:99999;transform:translate(-50%,-50%);box-shadow:0 0 10px rgba(77,138,255,0.8);}
+    #cursor-ring{position:fixed;width:28px;height:28px;border:1px solid rgba(77,138,255,0.5);border-radius:50%;pointer-events:none;z-index:99998;transform:translate(-50%,-50%);}
+    .particle{position:fixed;pointer-events:none;z-index:99997;font-family:'Orbitron',monospace;font-weight:900;font-size:0.85rem;color:var(--blue-light);text-shadow:0 0 10px rgba(77,138,255,0.9);animation:particleFly 0.9s ease-out forwards;}
+    @keyframes particleFly{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-55px) scale(0.5);}}
+
+    /* BG GRID */
+    .grid-bg{position:fixed;inset:0;background-image:linear-gradient(rgba(21,101,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(21,101,255,0.04) 1px,transparent 1px);background-size:60px 60px;animation:gridMove 20s linear infinite;pointer-events:none;}
+    @keyframes gridMove{0%{transform:translateY(0)}100%{transform:translateY(60px)}}
+    .glow{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:700px;background:radial-gradient(circle,rgba(255,32,32,0.07) 0%,rgba(21,101,255,0.05) 40%,transparent 70%);pointer-events:none;}
+
+    /* CONTENT */
+    .content{position:relative;z-index:1;}
+    .error-code{font-family:'Orbitron',monospace;font-size:clamp(6rem,20vw,14rem);font-weight:900;line-height:1;background:linear-gradient(135deg,var(--blue-light),var(--red),var(--yellow));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:glitch 4s infinite;}
+
+    @keyframes glitch {
+      0%,90%,100%{text-shadow:none;transform:translate(0);}
+      91%{text-shadow:-3px 0 var(--red),3px 0 var(--blue-light);transform:translate(-2px,0);}
+      92%{text-shadow:3px 0 var(--red),-3px 0 var(--blue-light);transform:translate(2px,0);}
+      93%{text-shadow:-2px 0 var(--yellow),2px 0 var(--red);transform:translate(0);}
+      94%{text-shadow:none;transform:translate(0);}
+    }
+
+    .zero-speed{font-family:'Share Tech Mono',monospace;font-size:clamp(0.8rem,2.5vw,1.1rem);color:var(--red);letter-spacing:0.4em;text-transform:uppercase;margin:0.5rem 0 1.5rem;animation:blink 2s ease-in-out infinite;}
+    @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+    .error-title{font-family:'Orbitron',monospace;font-size:clamp(1.2rem,3vw,2rem);font-weight:700;color:var(--text);margin-bottom:1rem;}
+    .error-desc{color:#7788aa;max-width:480px;margin:0 auto 2.5rem;line-height:1.8;font-size:1.05rem;}
+
+    .speed-joke{display:inline-block;background:rgba(255,32,32,0.08);border:1px solid rgba(255,32,32,0.25);color:#ff7070;font-family:'Share Tech Mono',monospace;font-size:0.8rem;letter-spacing:0.1em;padding:0.5rem 1.2rem;margin-bottom:2.5rem;clip-path:polygon(6px 0%,100% 0%,calc(100% - 6px) 100%,0% 100%);}
+
+    .btn-group{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;}
+    .btn{display:inline-flex;align-items:center;gap:0.5rem;padding:0.85rem 2.2rem;font-family:'Orbitron',monospace;font-size:0.78rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;border:none;cursor:pointer;transition:all 0.3s;clip-path:polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%);}
+    .btn-primary{background:linear-gradient(135deg,var(--blue),#003bb5);color:#fff;box-shadow:0 0 25px rgba(21,101,255,0.4);}
+    .btn-primary:hover{background:linear-gradient(135deg,var(--blue-light),var(--blue));box-shadow:0 0 45px rgba(21,101,255,0.7);transform:translateY(-2px);}
+    .btn-outline{background:transparent;color:var(--muted);border:1px solid var(--border);clip-path:none;}
+    .btn-outline:hover{color:var(--blue-light);border-color:var(--blue-light);transform:translateY(-2px);}
+
+    /* FLOATING ZEROS */
+    .float-zero{position:fixed;font-family:'Orbitron',monospace;font-weight:900;color:rgba(255,32,32,0.08);pointer-events:none;animation:floatUp linear infinite;}
+    @keyframes floatUp{0%{transform:translateY(110vh);opacity:0;}10%{opacity:1;}90%{opacity:1;}100%{transform:translateY(-10vh);opacity:0;}}
+
+    .counter-down{font-family:'Share Tech Mono',monospace;font-size:0.85rem;color:var(--muted);margin-top:2rem;}
+    .counter-down span{color:var(--blue-light);font-weight:bold;}
+
+    ::-webkit-scrollbar{width:5px;} ::-webkit-scrollbar-track{background:var(--bg);} ::-webkit-scrollbar-thumb{background:var(--blue);}
+  </style>
+</head>
+<body>
+
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+<div class="grid-bg"></div>
+<div class="glow"></div>
+
+<!-- Floating background zeros -->
+<div class="float-zero" style="left:5%;font-size:6rem;animation-duration:8s;animation-delay:0s;">+0</div>
+<div class="float-zero" style="left:20%;font-size:4rem;animation-duration:11s;animation-delay:2s;">+0</div>
+<div class="float-zero" style="left:40%;font-size:7rem;animation-duration:9s;animation-delay:4s;">+0</div>
+<div class="float-zero" style="left:60%;font-size:5rem;animation-duration:12s;animation-delay:1s;">+0</div>
+<div class="float-zero" style="left:78%;font-size:8rem;animation-duration:10s;animation-delay:3s;">+0</div>
+<div class="float-zero" style="left:90%;font-size:4rem;animation-duration:7s;animation-delay:5s;">+0</div>
+
+<div class="content">
+  <div class="error-code">404</div>
+  <div class="zero-speed">// +0 speed per second</div>
+  <div class="error-title">Page Not Found</div>
+  <p class="error-desc">
+    You've reached maximum speed... in the wrong direction.
+    This page doesn't exist — but the game does.
+  </p>
+  <div class="speed-joke">⚠ Speed dropped to +0. Critical error.</div>
+  <div class="btn-group">
+    <a href="index.html" class="btn btn-primary">← Back to Home</a>
+    <a href="https://www.roblox.com/de/games/96306857610199/random-game-for-now" target="_blank" class="btn btn-outline">▶ Play Instead</a>
+  </div>
+  <div class="counter-down">Auto-redirecting in <span id="countdown">10</span>s</div>
+</div>
+
+<script>
+  // CURSOR
+  const cursor=document.getElementById('cursor'),ring=document.getElementById('cursor-ring');
+  let mx=0,my=0,rx=0,ry=0;
+  document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx+'px';cursor.style.top=my+'px';});
+  (function a(){rx+=(mx-rx)*0.12;ry+=(my-ry)*0.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(a);})();
+
+  // +1 PARTICLES
+  const cols=['#4d8aff','#ff2020','#ffd600','#00e676','#c678dd'];
+  document.addEventListener('click',e=>{const p=document.createElement('div');p.className='particle';p.textContent='+1';p.style.left=e.clientX+'px';p.style.top=e.clientY+'px';p.style.color=cols[Math.floor(Math.random()*cols.length)];document.body.appendChild(p);setTimeout(()=>p.remove(),900);});
+
+  // COUNTDOWN REDIRECT
+  let t=10;
+  const cd=document.getElementById('countdown');
+  const iv=setInterval(()=>{t--;cd.textContent=t;if(t<=0){clearInterval(iv);window.location.href='index.html';}},1000);
+</script>
+</body>
+</html>
